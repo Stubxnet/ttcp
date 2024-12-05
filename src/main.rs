@@ -4,8 +4,8 @@ use tcp::measure_tcp_timings;
 use analyze::detect_anomalies;
 use time::OffsetDateTime;
 
-mod tcp;
-mod analyze;
+mod components::tcp;
+mod components::analyze;
 
 fn main() -> Result<()> {
     let matches = Command::new("DPIDetect")
