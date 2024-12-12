@@ -1,0 +1,15 @@
+Source: ttcp
+Section: utils
+Priority: optional
+Maintainer: 0l-bitly <prmail@ik.me>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.6
+Homepage: https://example.com
+Vcs-Git: https://codeberg.org/0l-bitly/ttcp.git
+Vcs-Browser: https://codeberg.org/0l-bitly/ttcp
+
+Package: ttcp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Mesure les temps de réponse TCP d'un serveur.
+ Mesure les temps de réponse TCP pour un hôte donné, afin de mesurer les performances et détecter des anomalies. Codé par 0l-bitly ; licence GPL-3.0-or-later.

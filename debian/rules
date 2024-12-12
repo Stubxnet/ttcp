@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ 
+
+override_dh_auto_build:
+	cargo build --release
+
+override_dh_auto_install:
+# Créez le répertoire d'installation
+	mkdir -p $(DESTDIR)/usr/bin
+# Copiez l'exécutable dans le répertoire d'installation
+	cp target/release/ttcp $(DESTDIR)/usr/bin/
+
+override_dh_auto_clean:
+	cargo clean
+	dh_auto_clean
