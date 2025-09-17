@@ -1,10 +1,8 @@
-/// Algorithme de détection d'anomalies de ttcp
-/// 
-/// Il utilise un système de détection d'anomalie basée sur l'analyse des temps de réponse.
-/// Fait aussi une moyenne et un écart type.
+/// Anomaly detection alorithm
+/// Takes timings in entry.
 pub fn detect_anomalies(timings: &[u128]) {
     if timings.is_empty() {
-        println!("Aucun temps de réponse à analyser.");
+        println!("ERR: No response time to analyze.");
         return;
     }
 
@@ -15,14 +13,14 @@ pub fn detect_anomalies(timings: &[u128]) {
     }).sum::<f64>() / timings.len() as f64;
     let stddev = variance.sqrt();
 
-    println!("Moyenne des temps de réponse: {:.2} ms", mean);
-    println!("Écart type des temps de réponse: {:.2} ms", stddev);
+    println!("Response time average: {:.2} ms", mean);
+    println!("Generic reponse time: {:.2} ms", stddev);
 
     let threshold = 3.0 * stddev;
 
     for &time in timings {
         if (time as f64 - mean).abs() > threshold {
-            println!("Anomalie détectée: {} ms", time);
+            println!("Detected anomaly: {} ms", time);
         }
     }
 
@@ -30,24 +28,24 @@ pub fn detect_anomalies(timings: &[u128]) {
     let max_time = *timings.iter().max().unwrap() as f64;
 
     if max_time > mean + 5.0 * stddev {
-        println!("Anomalie potentielle détectée: temps de réponse exceptionnellement long: {} ms", max_time);
+        println!("Response time seems anormaly long with {} ms", max_time);
     }
     if min_time < mean - 5.0 * stddev {
-        println!("Anomalie potentielle détectée: temps de réponse exceptionnellement court: {} ms", min_time);
+        println!("Response time seems anormaly short with {} ms", min_time);
     }
 }
-/// Fonction pour afficher les headers
+/// Headers printing function.
 /// 
-/// Affiche les en-têtes reçus
+/// Prints headers.
 pub fn print_headers(response_headers: &[u8]) {
-    println!("En-têtes reçus :");
+    println!("Received HEADERS (Raw):");
     println!("{}", String::from_utf8_lossy(response_headers));
 }
 
-/// Fonction pour afficher le contenu
+/// Content printing function.
 /// 
-/// Affiche le contenu reçu
+/// Prints reçeived content (Raw).
 pub fn print_content(response_content: &[u8]) {
-    println!("Contenu reçu :");
+    println!("Received content (Raw) :");
     println!("{}", String::from_utf8_lossy(response_content));
 }

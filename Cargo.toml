@@ -5,5 +5,5 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.94"
-clap = "4.5.21"
+clap = { version = "4.5.21", features = ["derive"] }
 time = "0.3.37"
