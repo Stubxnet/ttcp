@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=TCP Timing Tool
+Comment=Measure TCP connection timings
+Exec=/usr/local/bin/ttcp --help
+Icon=/usr/local/share/icons/ttcp.png
+Terminal=true
+Type=Application
+Categories=Network;Utility;

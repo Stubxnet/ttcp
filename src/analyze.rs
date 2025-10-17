@@ -1,4 +1,4 @@
-/// Anomaly detection alorithm
+/// Anomaly detection alorithm (very bad, to improve absolutely)
 /// Takes timings in entry.
 pub fn detect_anomalies(timings: &[u128]) {
     if timings.is_empty() {
@@ -44,7 +44,7 @@ pub fn print_headers(response_headers: &[u8]) {
 
 /// Content printing function.
 /// 
-/// Prints reçeived content (Raw).
+/// Prints received content (Raw).
 pub fn print_content(response_content: &[u8]) {
     println!("Received content (Raw) :");
     println!("{}", String::from_utf8_lossy(response_content));

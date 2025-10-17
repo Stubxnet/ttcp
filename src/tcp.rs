@@ -1,8 +1,7 @@
+use std::io::{self, Write, Read};
 use std::net::TcpStream;
-use std::io::{Write, Read};
+use std::time::Instant;
 use anyhow::Result;
-
-const BUFFER_SIZE: usize = 1024;
 
 /// Measures reponse time:
 /// 
@@ -14,54 +13,57 @@ const BUFFER_SIZE: usize = 1024;
 /// # Returns
 /// 
 /// Result contains HEADERS, response content and response time.
-pub fn measure_tcp_timings(host: &str, port: u16) -> Result<(Vec<u128>, Vec<u8>, Vec<u8>)> {
+
+pub fn measure_tcp_timings(host: &str, port: u16) -> Result<(Vec<u128>, Vec<u8>, Vec<u8>), io::Error> {
     let mut timings = Vec::new();
 
-    let start_time = std::time::Instant::now();
+    // Measure SYN time
+    let start_time = Instant::now();
     let mut stream = TcpStream::connect((host, port))?;
     let syn_time = start_time.elapsed().as_millis();
     timings.push(syn_time);
     println!("Response time to SYN request: {} ms", syn_time);
 
-    let request = format!("GET / HTTP/1.1\r\nHost: {}\r\n\r\n", host);
-    let start_time = std::time::Instant::now();
+    // Prepare and send the HTTP request
+    let request = format!("GET / HTTP/1.1\r\nHost: {}\r\nConnection: close\r\n\r\n", host);
+    
+    // Measure request time
+    let start_time = Instant::now();
     stream.write_all(request.as_bytes())?;
-    let ack_time = start_time.elapsed().as_millis();
-    timings.push(ack_time);
-    println!("Response time to ACK request: {} ms", ack_time);
+    let request_time = start_time.elapsed().as_millis();
+    timings.push(request_time);
+    println!("Response time to ACK request: {} ms", request_time);
 
-    let start_time = std::time::Instant::now();
-    let response_headers = read_data(&mut stream, b"\r\n\r\n")?;
-    let headers_time = start_time.elapsed().as_millis();
-    timings.push(headers_time);
-    println!("Response time to HEADERS request: {} ms", headers_time);
+    // Measure response times
+    let start_time = Instant::now();
+    let mut response_headers = Vec::new();
+    let mut buffer = vec![0; 1024];
+    let mut read_bytes = 0;
 
-    let start_time = std::time::Instant::now();
-    let response_content = read_data(&mut stream, b"")?;
-    let content_time = start_time.elapsed().as_millis();
-    timings.push(content_time);
-    println!("Response time to content request: {} ms", content_time);
-
-    let start_time = std::time::Instant::now();
-    drop(stream);
-    let fin_time = start_time.elapsed().as_millis();
-    timings.push(fin_time);
-    println!("Response time to connexion end: {} ms", fin_time);
-    Ok((timings, response_content, response_headers))
-}
-
-fn read_data(stream: &mut TcpStream, terminator: &[u8]) -> Result<Vec<u8>> {
-    let mut data = Vec::new();
-    loop {
-        let mut buf = [0; BUFFER_SIZE];
-        let n = stream.read(&mut buf)?;
-        if n == 0 {
-            break;
-        }
-        data.extend_from_slice(&buf[..n]);
-        if data.ends_with(terminator) {
+    while let Ok(bytes) = stream.read(&mut buffer[read_bytes..]) {
+        if bytes == 0 { break; }
+        read_bytes += bytes;
+        if response_headers.ends_with(b"\r\n\r\n") {
             break;
         }
     }
-    Ok(data)
+    
+    response_headers.truncate(read_bytes);
+    
+    let response_time = start_time.elapsed().as_millis();
+    timings.push(response_time);
+    println!("Response time to headers content: {} ms", response_time);
+
+    // Reading the content
+    let mut response_content = Vec::new();
+    let _ = stream.read_to_end(&mut response_content)?;
+
+    // Measure connection end time
+    let start_time = Instant::now();
+    drop(stream);
+    let fin_time = start_time.elapsed().as_millis();
+    timings.push(fin_time);
+    println!("Response time to connection end: {} ms", fin_time);
+
+    Ok((timings, response_content, response_headers))
 }

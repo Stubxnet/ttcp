@@ -16,7 +16,6 @@ struct CommandLineInterface {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Command to measure TCP timings
     Measure {
         /// Host to connect to
         #[arg(short = 'H', long)]

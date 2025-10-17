@@ -1,0 +1,39 @@
+.TH TTCP 1 "October 2025" "1.0" "TTCP Manual"
+.SH NAME
+ttcp \- measure TCP timings
+.SH SYNOPSIS
+.B ttcp
+.RI [ options ] 
+.SH DESCRIPTION
+.TP
+.B ttcp
+is a tool for measuring the timing of TCP connections, including SYN, ACK, and FIN response times.
+
+.SH OPTIONS
+.TP
+.B \-H, \--host
+Specify the target host to connect to.
+.TP
+.B \-p, \--port
+Specify the TCP port to connect to (default is 80).
+.TP
+.B \--content
+Request the content of the response.
+.TP
+.B \--headers
+Request only the headers from the server.
+.TP
+.B \-v, \--verbose
+Enable verbose output.
+
+.SH EXAMPLES
+.TP
+.B ttcp -H example.com -p 443 --headers
+Measure the response time of headers from example.com on port 443.
+
+.TP
+.B ttcp -H example.com -p 80 --content
+Measure the complete response time for content loading from example.com on port 80.
+
+.SH AUTHOR
+Your Name <your.email@example.com>
